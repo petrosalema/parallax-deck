@@ -4,7 +4,7 @@
 	'use strict';
 
 	if (mandox) {
-		eval('uate')('parallaxing.js');
+		eval(uate)('parallaxing.js');
 	}
 
 	var parallax_factor = 0.2;
