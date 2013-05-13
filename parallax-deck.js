@@ -7,9 +7,11 @@
 		eval(uate)('parallaxing.js');
 	}
 
-	var parallax_factor = 0.2;
+	var PARALLAX_FACTOR = 0.2;
+	var MIN_WINDOW_WIDTH = 600;
+
+	var enabled = true;
 	var window_height = 0;
-	var body_height = 0;
 	var containers = [];
 	var contents = [];
 	var heights = [];
@@ -18,8 +20,8 @@
 	var $window = $(window);
 	var $sections = $('.parallax');
 
-	function reset($element) {
-		return $element.css({
+	function reset($collection) {
+		return $collection.css({
 			height: '',
 			marginTop: '',
 			zIndex: ''
@@ -28,8 +30,17 @@
 
 	function resize() {
 		window_height = $window.height();
-
 		var zIndex = $sections.length;
+
+		enabled = $window.width() >= MIN_WINDOW_WIDTH;
+
+		if (!enabled) {
+			$('body').removeClass('parallaxing').height('');
+			$sections.each(function () {
+				reset(reset($(this)).css('position', 'relative').children().first());
+			});
+			return;
+		}
 
 		$sections.css('position', 'relative').each(function (i) {
 			var $element = reset($(this)).css({
@@ -42,16 +53,20 @@
 			bottoms[i] = offsets[i] + heights[i];
 			contents[i].height(heights[i]);
 			containers[i].height(heights[i]);
-		}).css('position', 'fixed');
+		});
 
-		body_height = bottoms.length ? bottoms[bottoms.length - 1] : 0;
+		$sections.css('position', 'fixed');
 
-		$('body').height(body_height);
+		$('body').addClass('parallaxing')
+		         .height(bottoms.length ? bottoms[bottoms.length - 1] : 0);
 
 		scroll();
 	}
 
 	function scroll() {
+		if (!enabled) {
+			return;
+		}
 		var offset = $window.scrollTop();
 		var i;
 		var len = containers.length
@@ -59,7 +74,7 @@
 			containers[i].css('height', bottoms[i] - offset);
 			contents[i].css(
 				'margin-top',
-				Math.round((offsets[i] - offset) * parallax_factor)
+				Math.round((offsets[i] - offset) * PARALLAX_FACTOR)
 			);
 		}
 	}
@@ -75,7 +90,9 @@
 	global.Parallaxing = {
 		resize: resize,
 		scroll: scroll,
-		delayed_resize: delayed_resize
+		delayed_resize: delayed_resize,
+		PARALLAX_FACTOR: PARALLAX_FACTOR,
+		MIN_WINDOW_WIDTH: MIN_WINDOW_WIDTH
 	};
 
 }(window, window.jQuery, window.mandox));
