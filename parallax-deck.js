@@ -12,9 +12,8 @@
 
 	var enabled = true;
 	var window_height = 0;
-	var containers = [];
-	var contents = [];
-	var heights = [];
+	var outer = [];
+	var inner = [];
 	var bottoms = [];
 	var offsets = [];
 	var $window = $(window);
@@ -46,13 +45,25 @@
 			var $element = reset($(this)).css({
 				zIndex: zIndex--
 			});
-			containers[i] = $element;
-			contents[i] = reset($element.children().first());
+
+			outer[i] = $element;
+			inner[i] = reset($element.children().first());
 			offsets[i] = $element.offset().top;
-			heights[i] = Math.max(window_height, $element.height());
-			bottoms[i] = offsets[i] + heights[i];
-			contents[i].height(heights[i]);
-			containers[i].height(heights[i]);
+
+			var height = Math.max(window_height, $element.height());
+
+			var overflow = height - window_height;
+			height += overflow / PARALLAX_FACTOR;
+
+			if (overflow) {
+				inner[i].children().first().removeClass('middle');
+			} else {
+				inner[i].children().first().addClass('middle');
+			}
+
+			bottoms[i] = offsets[i] + height;
+			inner[i].height(height);
+			outer[i].height(height);
 		});
 
 		$sections.css('position', 'fixed');
@@ -69,10 +80,10 @@
 		}
 		var offset = $window.scrollTop();
 		var i;
-		var len = containers.length
+		var len = outer.length
 		for (i = 0; i < len; i++) {
-			containers[i].css('height', bottoms[i] - offset);
-			contents[i].css(
+			outer[i].css('height', bottoms[i] - offset);
+			inner[i].css(
 				'margin-top',
 				Math.round((offsets[i] - offset) * PARALLAX_FACTOR)
 			);
