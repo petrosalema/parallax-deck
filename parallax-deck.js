@@ -98,9 +98,25 @@
 		delay = setTimeout(resize, 200);
 	}
 
+	function scroll_to($element) {
+		var len = outer.length;
+		if (0 === len) {
+			$('html, body').animate({scrollTop: $element.offset().top}, 1000);
+			return;
+		}
+		var i;
+		for (i = 0; i < len; i++) {
+			if ($element[0] === outer[i][0]) {
+				$('html, body').animate({scrollTop: offsets[i]}, 1000);
+				return;
+			}
+		}
+	}
+
 	global.Parallaxing = {
 		resize: resize,
 		scroll: scroll,
+		scroll_to: scroll_to,
 		delayed_resize: delayed_resize,
 		PARALLAX_FACTOR: PARALLAX_FACTOR,
 		MIN_WINDOW_WIDTH: MIN_WINDOW_WIDTH
